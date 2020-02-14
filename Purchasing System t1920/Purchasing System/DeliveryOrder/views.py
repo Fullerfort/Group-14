@@ -35,6 +35,8 @@ def deliveryorderform(request):
 @login_required
 def fillingdeliveryorder(request):
 
+def fillingdeliveryorder(request):
+
     global responsesItems
     context = {}
     pur_id = request.GET['pur_id']
