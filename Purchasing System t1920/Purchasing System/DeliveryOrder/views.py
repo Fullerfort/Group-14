@@ -35,24 +35,26 @@ def deliveryorderform(request):
 @login_required
 def fillingdeliveryorder(request):
 
+def fillingdeliveryorder(request):
+
+    global responsesItems
     context = {}
     pur_id = request.GET['pur_id']
     do_id = random.randint(10000000,99999999)
     user_id = request.user.id
-    staff = Person.objects.get(user_id = user_id)
 
     try: 
-        po = PurchaseOrder.objects.get(purchase_order_id = pur_id)
+        purchase_order = PurchaseOrder.objects.get(purchase_order_id = pur_id)
         item_list = PurchaseOrderItem.objects.filter(purchase_order_id = pur_id)
         context = {
                 'title': 'Delivery Order Form',
                 'delivery_order_id': 'DO' + str(do_id),
                 'purchase_order_id': pur_id, 
-                'staff_id' : staff.person_id,
-                'vendor_id': po.vendor_id.vendor_id,
+                'staff_id' : purchase_order.person_id.person_id,
+                'vendor_id': purchase_order.vendor_id.vendor_id,
                 'rows':item_list
             }
-
+        responsesItems = render(request,'DeliveryOrder/deliveryorderform.html',context).content
         return render(request,'DeliveryOrder/deliveryorderform.html',context)
 
     except PurchaseOrder.DoesNotExist:
@@ -69,8 +71,8 @@ def deliveryorderconfirmation(request):
     po_id = request.POST['purchase_order_id']
 
     user_id = request.user.id
-    staff = Person.objects.get(user_id=user_id)
-    
+    staff_id = request.POST['staff_id']
+    staff_info = Person.objects.get(person_id = staff_id)
     vendor_id = request.POST['vendor_id']
     shipping_inst = request.POST['shipping_inst']
     description = request.POST['description']
@@ -119,12 +121,12 @@ def deliveryorderconfirmation(request):
             'title': 'Delivery Order Confirmation',
             'purchase_order_id' : po_id,
             'delivery_order_id' : do_id,
-            'staff_id' : staff.person_id,
+            'staff_id' : staff_id,
             'vendor_id' : vendor_id,
             'shipping_inst' : shipping_inst,
             'grand_total': grand_total,
             'rows' : items,
-            'staff_info' : staff,
+            'staff_info' : staff_info,
             'vendor_info' : vendor_info,
             'description' : description,
             'year':'2019/2020'
